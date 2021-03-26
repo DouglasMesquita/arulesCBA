@@ -4,9 +4,7 @@
 #' A creator function \code{CBA_ruleset()} and several methods are provided.
 #'
 #' \code{CBA_ruleset} creates a new object of class \code{CBA} using the
-#' provides rules as the rule base.  For method \code{"first"}, the user needs
-#' to make sure that the rules are predictive and sorted from most to least
-#' predictive.
+#' provides rules as the rule base.
 #'
 #' @aliases CBA.object CBA_ruleset predict.CBA print.CBA rules rules.CBA
 #' @param formula A symbolic description of the model to be fitted. Has to be
@@ -16,11 +14,6 @@
 #' \code{apriori} (from \pkg{arules}).
 #' @param default Default class. If not
 #' specified then objects that are not matched by rules are classified as \code{NA}.
-#' @param method Classification method \code{"first"} found rule or
-#' \code{"majority"}.
-#' @param weights Rule weights for method majority. Either a quality measure
-#' available in \code{rules} or a numeric vector of the same length are
-#' \code{rules} can be specified. If missing, then equal weights are used
 #' @param bias Class bias vector.
 #' @param model An optional list with model information (e.g., parameters).
 #' @param discretization A list with discretization information used by \code{predict} to discretize data supplied as a \code{data.frame}.
@@ -36,8 +29,6 @@
 #'   \item{formula}{used formula.}
 #'   \item{rules}{the classifier rule base.}
 #'   \item{default}{default class label or \code{NA}.}
-#'   \item{method}{classification method.}
-#'   \item{weights}{rule weights.}
 #'   \item{bias}{class bias vector if available.}
 #'   \item{model}{list with model description.}
 #'   \item{discretization}{discretization information.}
@@ -65,7 +56,7 @@
 #' cars <- sort(cars, by = "conf")
 #'
 #' # create classifier and use the majority class as the default if no rule matches.
-#' cl <- CBA_ruleset(Species ~ ., cars, method = "first",
+#' cl <- CBA_ruleset(Species ~ ., cars, 
 #'   default = uncoveredMajorityClass(Species ~ ., trans, cars))
 #' cl
 #'
@@ -77,30 +68,15 @@
 #' table(prediction, response(Species ~ ., trans))
 #'
 #' # use weighted majority
-#' cl <- CBA_ruleset(Species ~ ., cars, method = "majority", weights = "lift",
-#'   default = uncoveredMajorityClass(Species ~ ., trans, cars))
+#' cl <- CBA_ruleset(Species ~ ., cars, default = uncoveredMajorityClass(Species ~ ., trans, cars))
 #' cl
 #'
 #' prediction <- predict(cl, trans)
 #' table(prediction, response(Species ~ ., trans))
 #'
 CBA_ruleset <- function(formula, rules, default = NA,
-      method = "first", weights = NULL, bias = NULL,
-      model = NULL, discretization = NULL, description = "Custom rule set", ...){
-
-  # method (need to match with predict!)
-  methods <- c("first", "majority", "weighted", "logit")
-  m <- pmatch(method, methods)
-  if(is.na(m)) stop("Unknown method")
-  method <- methods[m]
-
-  # add weights
-  if(!is.null(weights)) {
-    if(is.character(weights))
-      weights <- quality(rules)[[weights, exact = FALSE]]
-    else
-      weights <- weights
-  }
+                        bias = NULL, model = NULL, discretization = NULL, 
+                        description = "Custom rule set", ...){
 
   formula <- as.formula(formula)
   parsedformula <- .parseformula(formula, rhs(rules))
@@ -112,8 +88,6 @@ CBA_ruleset <- function(formula, rules, default = NA,
     length(rules), " rules used.")
 
     rules <- rules[take]
-    if(is.matrix(weights)) weights <- weights[take, ]
-    else weights <- weights[take]
   }
 
   # check if LHS is in formula!
@@ -125,8 +99,6 @@ CBA_ruleset <- function(formula, rules, default = NA,
     formula = formula,
     rules = rules,
     default = default,
-    weights = weights,
-    method = method,
     model = model,
     discretization = discretization,
     description = description
@@ -142,10 +114,6 @@ print.CBA <- function(x, ...)
     paste("Formula:", deparse(x$formula)),
     paste("Number of rules:", length(x$rules)),
     paste("Default Class:", x$default),
-    paste("Classification method:", x$method,
-      if(is.character(x$weights)) paste("by", x$weights) else "",
-      if(!is.null(x$best_k)) paste("- using best", x$best_k, "rules") else ""
-      ),
     strwrap(paste("Description:", x$description), exdent = 5),
     ""
   ))

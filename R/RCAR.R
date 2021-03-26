@@ -134,9 +134,7 @@ RCAR <- function(formula, data,
   CBA_ruleset(
     formula = formula,
     rules = rulebase,
-    weights = weights,
     bias = bias,
-    method='logit',
     model = list(
       all_rules = cars,
       reg_model = model,

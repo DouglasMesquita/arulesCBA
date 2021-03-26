@@ -17,7 +17,7 @@
 #' of form \code{class ~ .} or \code{class ~ predictor1 + predictor2}.
 #' @param data A data.frame or a transaction set containing the training data.
 #' Data frames are automatically discretized and converted to transactions.
-#' @param pruning Pruning strategy used: "M1" or "M2".
+#' @param pruning Pruning strategy used: "M1", "M2" or NULL.
 #' @param parameter,control Optional parameter and control lists for apriori.
 #' @param balanceSupport balanceSupport parameter passed to
 #' \code{\link{mineCARs}} function.
@@ -79,8 +79,10 @@ CBA <- function(formula, data, pruning = "M1",
     verbose = verbose, ...)
 
   if(verbose) cat("\nPruning CARs...\n")
-  if(pruning == "M1") rulebase <- pruneCBA_M1(formula, rulebase, trans)
-  else rulebase <- pruneCBA_M2(formula, rulebase, trans)
+  if(!is.null(pruning)) {
+    if(pruning == "M1") rulebase <- pruneCBA_M1(formula, rulebase, trans)
+    else rulebase <- pruneCBA_M2(formula, rulebase, trans)
+  }
 
   if(verbose) cat("CARs left:", length(rulebase), "\n")
 
@@ -88,7 +90,6 @@ CBA <- function(formula, data, pruning = "M1",
   CBA_ruleset(
     formula = formula,
     rules = rulebase,
-    method = "first",
     model = list(
       parameter = c(list(...), list(parameter))
     ),

@@ -13,8 +13,6 @@ CBA_ruleset(
   formula,
   rules,
   default = NA,
-  method = "first",
-  weights = NULL,
   bias = NULL,
   model = NULL,
   discretization = NULL,
@@ -26,7 +24,15 @@ rules(x)
 
 \method{rules}{CBA}(x)
 
-\method{predict}{CBA}(object, newdata, type = c("class", "score"), ...)
+\method{predict}{CBA}(
+  object,
+  newdata,
+  type = c("class", "score"),
+  method = "first",
+  weights = NULL,
+  best_k = NULL,
+  ...
+)
 }
 \arguments{
 \item{formula}{A symbolic description of the model to be fitted. Has to be
@@ -38,13 +44,6 @@ label before \code{=}).}
 
 \item{default}{Default class. If not
 specified then objects that are not matched by rules are classified as \code{NA}.}
-
-\item{method}{Classification method \code{"first"} found rule or
-\code{"majority"}.}
-
-\item{weights}{Rule weights for method majority. Either a quality measure
-available in \code{rules} or a numeric vector of the same length are
-\code{rules} can be specified. If missing, then equal weights are used}
 
 \item{bias}{Class bias vector.}
 
@@ -70,8 +69,6 @@ representing the trained classifier with fields:
   \item{formula}{used formula.}
   \item{rules}{the classifier rule base.}
   \item{default}{default class label or \code{NA}.}
-  \item{method}{classification method.}
-  \item{weights}{rule weights.}
   \item{bias}{class bias vector if available.}
   \item{model}{list with model description.}
   \item{discretization}{discretization information.}
@@ -87,9 +84,7 @@ A creator function \code{CBA_ruleset()} and several methods are provided.
 }
 \details{
 \code{CBA_ruleset} creates a new object of class \code{CBA} using the
-provides rules as the rule base.  For method \code{"first"}, the user needs
-to make sure that the rules are predictive and sorted from most to least
-predictive.
+provides rules as the rule base.
 }
 \examples{
 
@@ -106,7 +101,7 @@ cars <- cars[!is.redundant(cars)]
 cars <- sort(cars, by = "conf")
 
 # create classifier and use the majority class as the default if no rule matches.
-cl <- CBA_ruleset(Species ~ ., cars, method = "first",
+cl <- CBA_ruleset(Species ~ ., cars, 
   default = uncoveredMajorityClass(Species ~ ., trans, cars))
 cl
 
@@ -118,8 +113,7 @@ prediction <- predict(cl, trans)
 table(prediction, response(Species ~ ., trans))
 
 # use weighted majority
-cl <- CBA_ruleset(Species ~ ., cars, method = "majority", weights = "lift",
-  default = uncoveredMajorityClass(Species ~ ., trans, cars))
+cl <- CBA_ruleset(Species ~ ., cars, default = uncoveredMajorityClass(Species ~ ., trans, cars))
 cl
 
 prediction <- predict(cl, trans)

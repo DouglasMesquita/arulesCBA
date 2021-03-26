@@ -16,12 +16,10 @@ expect_equal(length(results), 5L)
 
 context("Prediction methods")
 
-cba_classifier$method <- "majority"
-results <- predict(cba_classifier, head(iris, n = 5))
+results <- predict(cba_classifier, head(iris, n = 5), method = "majority")
 expect_equal(length(results), 5L)
 
-cba_classifier$method <- "weighted"
-results <- predict(cba_classifier, head(iris, n = 5))
+results <- predict(cba_classifier, head(iris, n = 5), method = "majority")
 expect_equal(length(results), 5L)
 
 # FIXME: We need to check what the output of M2 should be

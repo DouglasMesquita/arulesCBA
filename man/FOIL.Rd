@@ -5,14 +5,7 @@
 \alias{foil}
 \title{Use FOIL to learn a rule set for classification}
 \usage{
-FOIL(
-  formula,
-  data,
-  max_len = 3,
-  min_gain = 0.7,
-  best_k = 5,
-  disc.method = "mdlp"
-)
+FOIL(formula, data, max_len = 3, min_gain = 0.7, disc.method = "mdlp")
 }
 \arguments{
 \item{formula}{A symbolic description of the model to be fitted. Has to be
@@ -24,9 +17,6 @@ Data frames are automatically discretized and converted to transactions.}
 \item{max_len}{maximal length of the LHS of the created rules.}
 
 \item{min_gain}{minimal gain required to expand a rule.}
-
-\item{best_k}{use the average expected accuracy (laplace) of the best k
-rules per class for prediction.}
 
 \item{disc.method}{Discretization method used to discretize continuous
 variables if data is a data.frame (default: \code{"mdlp"}). See

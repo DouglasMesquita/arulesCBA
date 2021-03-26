@@ -23,9 +23,14 @@ trans_test <- as(iris_test_disc, "transactions")
 rules <- mineCARs(Species ~ ., trans_train,
   parameter = list(support = 0.01, confidence = 0.8))
 
-classifier <- arulesCBA::CBA_ruleset(Species ~ ., rules, method = "majority")
+classifier <- arulesCBA::CBA_ruleset(Species ~ ., rules)
 classifier
 
-predict(classifier, head(trans_test))
+predict(classifier, head(trans_test), type = "score", method = "majority", weights = NULL)
+predict(classifier, head(trans_test), type = "score", method = "majority", weights = "lift", best_k = NULL)
+predict(classifier, head(trans_test), type = "score", method = "majority", weights = "lift", best_k = 4)
+predict(classifier, head(trans_test), type = "score", method = "weighted", weights = "lift")
+predict(classifier, head(trans_test), method = "first")
+
 
 

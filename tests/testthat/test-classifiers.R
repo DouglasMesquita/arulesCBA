@@ -41,12 +41,12 @@ for(cl in classifiers) {
 classifiers <- c(CBA, FOIL, RCAR)
 
 data(Groceries)
-dat <- sample(Groceries, 500)
+dat <- sample(Groceries, 1000)
 f <- `bottled beer` ~ .
 true <- response(f, dat)
 
 for(cl in classifiers) {
-  res <- cl(f, dat)
+  res <- cl(f, dat, default_class = "")
   print(res)
 
   p <- predict(res, dat)

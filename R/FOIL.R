@@ -24,8 +24,6 @@
 #' Data frames are automatically discretized and converted to transactions.
 #' @param max_len maximal length of the LHS of the created rules.
 #' @param min_gain minimal gain required to expand a rule.
-#' @param best_k use the average expected accuracy (laplace) of the best k
-#' rules per class for prediction.
 #' @param disc.method Discretization method used to discretize continuous
 #' variables if data is a data.frame (default: \code{"mdlp"}). See
 #' \code{\link{discretizeDF.supervised}} for more supervised discretization
@@ -55,7 +53,7 @@
 #' # make predictions for the first few instances of iris
 #' predict(classifier, head(iris))
 #'
-FOIL <- function(formula, data, max_len = 3, min_gain = .7, best_k = 5, disc.method = "mdlp"){
+FOIL <- function(formula, data, max_len = 3, min_gain = .7, disc.method = "mdlp"){
 
   formula <- as.formula(formula)
 
@@ -157,9 +155,6 @@ FOIL <- function(formula, data, max_len = 3, min_gain = .7, best_k = 5, disc.met
     formula = formula,
     rules = rules,
     default = majorityClass(formula, trans), ### FIXME
-    method = "weighted",
-    weights = "laplace",
-    best_k = best_k,
     discretization = attr(trans, "disc_info"),
     description = paste0("FOIL-based classifier (Yin and Han, 2003)")
   )

@@ -145,7 +145,6 @@ NULL
   CBA_ruleset(
     formula = formula,
     rules = rules,
-    method = "first",
     discretization = attr(trans, "disc_info"),
     description = paste("RWeka classifier", attr(what, "meta")$name)
   )
@@ -213,7 +212,6 @@ PART_CBA <- function(formula, data, control = NULL, disc.method = "mdlp")
   CBA_ruleset(
     formula = formula,
     rules = rules,
-    method = "first",
     discretization = attr(trans, "disc_info"),
     description = paste("RWeka classifier", attr(what, "meta")$name)
   )

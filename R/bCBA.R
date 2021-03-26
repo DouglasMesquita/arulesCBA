@@ -221,7 +221,6 @@ CBA.internal <- function(formula, data, method="boosted", gamma = 0.05, cost = 1
       discretization = disc_info,
       rules = classifier,
       default = defaultClass,
-      method = "first",
       description = description
     )
 
@@ -248,7 +247,6 @@ CBA.internal <- function(formula, data, method="boosted", gamma = 0.05, cost = 1
       rules = rules.sorted[rule_weights > 0],
       default = class[defaultClass],
       weights = rule_weights[rule_weights > 0],
-      method = "weighted",
       description = description
     )
 
@@ -262,8 +260,6 @@ CBA.internal <- function(formula, data, method="boosted", gamma = 0.05, cost = 1
       discretization = disc_info,
       rules = rules,
       default = names(which.max(rightHand)),
-      weights = rule_weights,
-      method = "weighted",
       description = description
     )
 
@@ -271,6 +267,5 @@ CBA.internal <- function(formula, data, method="boosted", gamma = 0.05, cost = 1
     stop("Method must be one of: 'CBA', 'boosted', 'weighted'.")
   }
 
-  classifier
-
+  return(classifier)
 }

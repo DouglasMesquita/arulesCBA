@@ -29,8 +29,6 @@
 #' Data frames are automatically discretized and converted to transactions.
 #' @param support,confidence minimum support and minimum confidence thresholds
 #' for CMAR (range [0, 1]).
-#' @param best_k use average expected accuracy (laplace) of the best k rules
-#' per class for prediction.
 #' @param disc.method Discretization method used to discretize continuous
 #' variables if data is a data.frame (default: \code{"mdlp"}). See
 #' \code{\link{discretizeDF.supervised}} for more supervised discretization
@@ -179,11 +177,12 @@ NULL
   filename <- tempfile(fileext = ".num")
   .write_trans_LUCS_KDD(formula, trans, filename)
 
-  exe <- paste(.java(), options()$java.parameters[1], "-cp", path, paste0("run", method),
+  java_cmd <- paste0("'", normalizePath(iconv(.javac(), "latin1", "ASCII", sub=""), winslash = "/"), "'")
+  exe <- paste(java_cmd, options()$java.parameters[1], "-cp", path, paste0("run", method),
     classParameter, paste0("-F", filename), parameter)
   if(verbose) cat(paste("Call:", exe, "\n\n"))
 
-  ret <- system(exe, intern = TRUE)
+  ret <- system(command = exe, intern = TRUE)
   if(!is.null(attr(ret, "status")) && attr(ret, "status") != 0) stop("Error in call: ", exe, "\n",ret)
   if(verbose) print(ret)
 
@@ -196,7 +195,7 @@ NULL
 ### NOTE: MIN_GAIN parameter is not exposed by LUCS-KDD CPAR implementation. It is set to 0.7
 ### NOTE: We use the most prevalent class if no rules match!
 #' @rdname LUCS_KDD_CBA
-FOIL2 <- function(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALSE) {
+FOIL2 <- function(formula, data, disc.method = "mdlp", verbose = FALSE) {
   formula <- as.formula(formula)
   trans <- prepareTransactions(formula, data, disc.method = disc.method)
   parsed_formula <- .parseformula(formula, trans)
@@ -207,16 +206,13 @@ FOIL2 <- function(formula, data, best_k = 5, disc.method = "mdlp", verbose = FAL
     formula = formula,
     rules = rules,
     default = majorityClass(formula, trans),
-    method = "weighted",
-    weights = "laplace",
-    best_k = best_k,
     discretization = attr(trans, "disc_info"),
     description = "FOIL-based classifier (Yin and Han, 2003 - LUCS-KDD implementation)."
   )
 }
 
 #' @rdname LUCS_KDD_CBA
-CPAR <- function(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALSE) {
+CPAR <- function(formula, data, disc.method = "mdlp", verbose = FALSE) {
   formula <- as.formula(formula)
   trans <- prepareTransactions(formula, data, disc.method = disc.method)
   parsed_formula <- .parseformula(formula, trans)
@@ -228,9 +224,6 @@ CPAR <- function(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALS
     rules = rules,
     default = majorityClass(formula, trans),
     discretization = attr(trans, "disc_info"),
-    method = "weighted",
-    weights = "laplace",
-    best_k = best_k,
     description = paste0("CPAR (Yin and Han, 2003 - LUCS-KDD implementation).")
   ),
     class = "CBA"
@@ -238,7 +231,7 @@ CPAR <- function(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALS
 }
 
 #' @rdname LUCS_KDD_CBA
-PRM <- function(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALSE) {
+PRM <- function(formula, data, disc.method = "mdlp", verbose = FALSE) {
   formula <- as.formula(formula)
   trans <- prepareTransactions(formula, data, disc.method = disc.method)
   parsed_formula <- .parseformula(formula, trans)
@@ -249,9 +242,6 @@ PRM <- function(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALSE
     discretization = attr(trans, "disc_info"),
     rules = rules,
     default = majorityClass(formula, trans),
-    method = "weighted",
-    weights = "laplace",
-    best_k = best_k,
     description = paste0("PRM (Yin and Han, 2003 - LUCS-KDD implementation).")
   ),
     class = "CBA"
@@ -282,8 +272,6 @@ CMAR <- function(formula, data, support = 0.1, confidence = 0.5, disc.method = "
     parameter = list(support = support, confidence = confidence),
     rules = rules,
     default = majorityClass(formula, trans),
-    weights = "weightedChiSquared",
-    method = "weighted",
     description = paste0("CMAR (Li, Han and Pei, 2001 - LUCS-KDD implementation).")
   ),
     class = "CBA"
@@ -328,12 +316,14 @@ install_LUCS_KDD_CPAR <- function(force = FALSE, source = "https://cgi.csc.liv.a
   file.copy(file.path(src, "runPRM.java"), path)
 
   cat("Compiling.\n")
-  exe <- paste(.javac(), "-cp", path, file.path(path, "runCPAR.java"))
-  ret <- system(exe, intern = TRUE)
-  exe <- paste(.javac(), "-cp", path, file.path(path, "runFOIL.java"))
-  ret <- system(exe, intern = TRUE)
-  exe <- paste(.javac(), "-cp", path, file.path(path, "runPRM.java"))
-  ret <- system(exe, intern = TRUE)
+  java_cmd <- paste0("'", normalizePath(iconv(.javac(), "latin1", "ASCII", sub=""), winslash = "/"), "'")
+  
+  exe <- paste(java_cmd, "-cp", path, file.path(path, "runCPAR.java"))
+  ret <- system(command = exe, intern = TRUE)
+  exe <- paste(java_cmd, "-cp", path, file.path(path, "runFOIL.java"))
+  ret <- system(command = exe, args = TRUE)
+  exe <- paste(java_cmd, "-cp", path, file.path(path, "runPRM.java"))
+  ret <- system(command = exe, args = TRUE)
 }
 
 #' @rdname LUCS_KDD_CBA
@@ -374,7 +364,8 @@ install_LUCS_KDD_CMAR <- function(force = FALSE, source = "https://cgi.csc.liv.a
   file.copy(file.path(src, "runCMAR.java"), path)
 
   cat("Compiling.\n")
-  exe <- paste(.javac(), "-cp", path, file.path(path, "runCMAR.java"))
-  ret <- system(exe, intern = TRUE)
+  java_cmd <- normalizePath(iconv(.javac(), "latin1", "ASCII", sub=""), winslash = "/")
+  exe <- paste(java_cmd, "-cp", path, file.path(path, "runCMAR.java"))
+  ret <- system(command = exe, intern = TRUE)
 }
 

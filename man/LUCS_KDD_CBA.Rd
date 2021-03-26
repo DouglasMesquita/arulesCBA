@@ -10,11 +10,11 @@
 \alias{install_LUCS_KDD_CMAR}
 \title{Interface to the LUCS-KDD Implementations of CMAR, PRM and CPAR}
 \usage{
-FOIL2(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALSE)
+FOIL2(formula, data, disc.method = "mdlp", verbose = FALSE)
 
-CPAR(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALSE)
+CPAR(formula, data, disc.method = "mdlp", verbose = FALSE)
 
-PRM(formula, data, best_k = 5, disc.method = "mdlp", verbose = FALSE)
+PRM(formula, data, disc.method = "mdlp", verbose = FALSE)
 
 CMAR(
   formula,
@@ -42,9 +42,6 @@ of form \code{class ~ .} or \code{class ~ predictor1 + predictor2}.}
 
 \item{data}{A data.frame or a transaction set containing the training data.
 Data frames are automatically discretized and converted to transactions.}
-
-\item{best_k}{use average expected accuracy (laplace) of the best k rules
-per class for prediction.}
 
 \item{disc.method}{Discretization method used to discretize continuous
 variables if data is a data.frame (default: \code{"mdlp"}). See
