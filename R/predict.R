@@ -51,7 +51,10 @@ predict.CBA <- function(object, newdata, type = c("class", "score"), method = "f
   
   # Weights
   if(is.character(weights)) weights <- quality(object$rules)[[weights, exact = FALSE]]
-  if(is.null(weights)) weights <- rep(1, length(object$rules))
+  if(is.null(weights)) {
+    message("Using weights as 1.")
+    weights <- rep(1, length(object$rules))
+  }
   
   # Transform weight vector into a matrix
   if(!is.matrix(weights)) {

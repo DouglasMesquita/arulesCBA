@@ -127,15 +127,15 @@ mineCARs <- function(formula, transactions, parameter = NULL, control = NULL, ba
   if(is.null(parameter)) parameter <- dotParameter
   if(is.null(parameter) || is.list(parameter)) {
     if(is.null(parameter$conf)) {
-      message("Setting parameter$confidence as 0.5. You can modify it in the parameter list")
+      if(verbose) message("Setting parameter$confidence as 0.5. You can modify it in the parameter list")
       parameter$confidence <- 0.5
     }
     if(is.null(parameter$maxlen)) {
-      message("Setting parameter$maxlen as 5. You can modify it in the parameter list")
+      if(verbose) message("Setting parameter$maxlen as 5. You can modify it in the parameter list")
       parameter$maxlen <- 5L
     } 
     if(is.null(parameter$originalSupport)) {
-      message("Setting parameter$originalSupport as TRUE You can modify it in the parameter list")
+      if(verbose) message("Setting parameter$originalSupport as TRUE You can modify it in the parameter list")
       parameter$originalSupport <- TRUE
     } 
   }
