@@ -65,6 +65,8 @@ predict.CBA <- function(object, newdata, type = c("class", "score"), method = "f
     })
   }
   
+  if(is.null(nrow(weights))) weights <- matrix(weights, nrow = 1)
+  
   if(nrow(weights) != length(object$rules) || ncol(weights) != length(levels(RHSclass)))
     stop("number of weights does not match number of rules/classes.")
   
@@ -84,7 +86,6 @@ predict.CBA <- function(object, newdata, type = c("class", "score"), method = "f
     
   } else {
     ### Score is the average of the top-N matching rules (see CPAR paper by Yin and Han, 2003)
-    
     scores <- t(apply(rulesMatchLHS, MARGIN = 2, FUN = function(m) {
       m_weights <- weights*m
       m_weights <- apply(m_weights, MARGIN = 2, sort, decreasing = TRUE)[1:min(best_k, nrow(m_weights)), , drop = FALSE]
