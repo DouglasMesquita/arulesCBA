@@ -39,7 +39,7 @@ prepareTransactions <- function(formula, data, disc.method = "mdlp", match = NUL
       data <- addComplement(data, all.vars(formula)[1])
     
     ### Note: transactions might need recoding!
-    if(!is.null(match)) return(recode(data, match = match))
+    if(!is.null(match)) return(recode(data, itemLabels = itemLabels(match)))
     else return(data)
   }
   
